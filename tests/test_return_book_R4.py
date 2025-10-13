@@ -12,11 +12,6 @@ def setup_database():
     # Borrow the book for positive test
     borrow_book_by_patron("654321", 4)
 
-def test_return_book_not_implemented():
-    """Test that R4 returns not implemented message."""
-    success, message = return_book_by_patron("654321", 4)
-    assert not success
-    assert "not yet implemented" in message.lower()
 
 @pytest.mark.skip(reason="R4 not implemented yet")
 def test_return_book_valid_positive():
