@@ -104,14 +104,7 @@ def borrow_book_by_patron(patron_id: str, book_id: int) -> Tuple[bool, str]:
 
 def return_book_by_patron(patron_id: str, book_id: int) -> Tuple[bool, str]:
     """
-    Process book return by a patron.
-    
-    TODO: Implement R4 as per requirements
-    
-    """
-    """
     R4: Book Return Processing
-
     Steps:
     1. Validate patron ID format
     2. Check if book exists
@@ -120,48 +113,48 @@ def return_book_by_patron(patron_id: str, book_id: int) -> Tuple[bool, str]:
     5. Update book availability (+1)
     6. Calculate and report late fee using R5
     """
-
-    # Step 1: Validate patron ID
-    if not patron_id.isdigit() or len(patron_id) != 6:
+    # Step 1: Validate patron ID format
+    if not patron_id or not patron_id.isdigit() or len(patron_id) != 6:
         return False, "Invalid patron ID. Must be a 6-digit number."
 
-    # Step 2: Validate that the book exists
+    # Step 2: Check if book exists
     book = get_book_by_id(book_id)
     if not book:
-        return False, "Book return functionality is not yet implemented."
+        return False, "Book not found."
 
-    # Step 3: Verify that this patron actually borrowed this book and not yet returned
+    # Step 3: Verify that this patron borrowed this book and not yet returned
     borrowed_books = get_patron_borrowed_books(patron_id)
     borrowed_book = None
     for b in borrowed_books:
-        if b["book_id"] == book_id and b["return_date"] is None:
+        # 有的数据库返回结构里可能没有 'return_date'，所以我们要用 get() 防止 KeyError
+        if b["book_id"] == book_id and b.get("return_date") is None:
             borrowed_book = b
             break
 
     if not borrowed_book:
-        return False, "No active borrow record found for this patron and book."
+        return False, "This book was not borrowed by this patron or has already been returned."
 
-    # Step 4: Update the borrow record with the return date
+    # Step 4: Update return date
     return_date = datetime.now()
     success = update_borrow_record_return_date(patron_id, book_id, return_date)
     if not success:
         return False, "Database error occurred while updating return record."
 
-    # Step 5: Increment available copies
+    # Step 5: Update availability (+1)
     availability_success = update_book_availability(book_id, +1)
     if not availability_success:
         return False, "Database error occurred while updating book availability."
 
-    # Step 6: Calculate late fee (use R5)
+    # Step 6: Calculate late fee (R5)
     fee_info = calculate_late_fee_for_book(patron_id, book_id)
     fee = fee_info.get("fee_amount", 0.00)
     days = fee_info.get("days_overdue", 0)
 
-    # Step 7: Return user-friendly message
+    # Step 7: Return result
     if fee > 0:
-        return True, f'Book "{book["title"]}" returned successfully. Late fee: ${fee:.2f} ({days} day(s) overdue).'
+        return True, f'Book "{book["title"]}" successfully returned. Late fee: ${fee:.2f} ({days} day(s) overdue).'
     else:
-        return True, f'Book "{book["title"]}" returned successfully. No late fee.'
+        return True, f'Book "{book["title"]}" successfully returned. No late fee.'
 
             
 def calculate_late_fee_for_book(patron_id: str, book_id: int) -> Dict:
