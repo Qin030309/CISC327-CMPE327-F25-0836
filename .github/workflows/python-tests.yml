@@ -1,4 +1,4 @@
-name: Python CI - Confirmed Versions
+name: Python CI
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [3.10, 3.11]  # 明确指定两个可用版本
+        python-version: [3.10, 3.11]
 
     steps:
     - name: Checkout repository
@@ -24,7 +24,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Check Python version
-      run: python --version  # 打印实际使用的 Python
+      run: python --version
 
     - name: Install dependencies
       run: |
@@ -35,4 +35,7 @@ jobs:
 
     - name: Run tests
       run: pytest -v
+
+    # 可选：设置 job 超时，避免长时间挂起
+    timeout-minutes: 30
 
