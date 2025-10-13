@@ -33,7 +33,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
       - name: Initialize database
-        run: python -c "from database import init_db; init_db()"
+        run: python -c "from database import init_database; init_database()"
       
       - name: Run tests
         run: pytest -v
