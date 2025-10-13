@@ -9,11 +9,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    
     strategy:
       matrix:
         python-version: ["3.10", "3.11"]
-    timeout-minutes: 30  # 这里要在 jobs.test 下
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -31,6 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       
+      - name: Initialize database
+        run: python -c "from database import init_db; init_db()"
+      
       - name: Run tests
         run: pytest -v
-
+        
+      timeout-minutes: 30
