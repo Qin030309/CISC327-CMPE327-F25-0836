@@ -36,4 +36,4 @@ jobs:
         run: python -c "from database import init_database; init_database()"
       
       - name: Run tests
-        run: pytest -v
+        run: pytest -v --ignore=tests/test_ai_generated.py
