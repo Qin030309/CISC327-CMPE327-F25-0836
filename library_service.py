@@ -1,5 +1,5 @@
 """
-Library Service Module - Business Logic Functions
+ibrary Service Module - Business Logic Functions
 Contains all the core business logic for the Library Management System
 """
 
