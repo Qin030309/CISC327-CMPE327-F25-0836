@@ -1,0 +1,23 @@
+from services.library_service import *
+from services.payment_service import *
+
+def test_errors():
+    reset_globals()
+    add_book_to_catalog('b1', 'Book1', 'A1', '1234567890')
+    assert add_book_to_catalog('b1', 'B2', 'A2', '1234567890')[0] == False
+    assert add_book_to_catalog('b2', '', 'A', '1234567890')[0] == False
+    assert add_book_to_catalog('b3', 'T', '', '1234567890')[0] == False
+    assert add_book_to_catalog('b4', 'T', 'A', '123')[0] == False
+    assert borrow_book_by_patron('xxx', 'p1')[0] == False
+    add_book_to_catalog('b7', 'B7', 'A7', '1234567890')
+    assert return_book_by_patron('b7', 'p1')[0] == False
+
+def test_branches():
+    reset_globals()
+    assert add_book_to_catalog('b20', 'Book', 'Author', '1234567890123') == True
+    add_book_to_catalog('b10', 'Python', 'A', '1234567890')
+    assert len(search_books('Python')) > 0
+    borrow_book_by_patron('b10', 'p10')
+    assert len(get_patron_borrowed_books('p10')) == 1
+    return_book_by_patron('b10', 'p10')
+    assert len(get_patron_borrowed_books('p10')) == 0

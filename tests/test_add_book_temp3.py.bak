@@ -1,0 +1,8 @@
+from services.library_service import add_book_to_catalog
+
+def test_add_book_to_catalog_valid():
+    # 使用合法 13 位 ISBN
+    isbn = '1234567890123'
+    result = add_book_to_catalog('b100', 'Test Book', 'Author A', isbn)
+    print('add_book result:', result)
+    assert result is True

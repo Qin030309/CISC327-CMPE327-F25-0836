@@ -1,0 +1,44 @@
+import pytest
+from services.library_service import (
+    get_catalog,
+    get_borrowed_books,
+    get_patron_borrowed_books,
+    add_book_to_catalog,
+    borrow_book_by_patron,
+    return_book_by_patron,
+    reset_globals
+)
+
+# 每个测试前重置全局变量，保证干净环境
+@pytest.fixture(autouse=True)
+def run_before_tests():
+    reset_globals()
+
+def test_get_catalog():
+    catalog = get_catalog()
+    assert isinstance(catalog, dict)
+
+def test_get_borrowed_books():
+    borrowed = get_borrowed_books()
+    assert isinstance(borrowed, dict)
+
+def test_get_patron_borrowed_books():
+    borrowed = get_patron_borrowed_books('patron1')
+    assert isinstance(borrowed, list)
+
+def test_add_book_to_catalog():
+    # 合法 ISBN 10 位
+    result = add_book_to_catalog('b300', 'Clean Test Book', 'Author Clean', '0123456789')
+    assert result is True
+
+def test_borrow_and_return():
+    # 添加书
+    add_book_to_catalog('b301', 'Borrow Clean Test', 'Author Clean', '0123456789')
+    # 借书
+    borrow_book_by_patron('b301', 'patron1')
+    borrowed = get_patron_borrowed_books('patron1')
+    assert 'b301' in [b['id'] for b in borrowed]
+    # 还书
+    return_book_by_patron('b301', 'patron1')
+    borrowed_after = get_patron_borrowed_books('patron1')
+    assert 'b301' not in [b['id'] for b in borrowed_after]

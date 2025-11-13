@@ -1,0 +1,6 @@
+from services.library_service import add_book_to_catalog
+
+def test_add_book_to_catalog_valid():
+    # 使用合法 10 位 ISBN
+    result = add_book_to_catalog('b100', 'Test Book', 'Author A', '1234567890')
+    assert result is True

@@ -1,0 +1,31 @@
+import pytest
+from services.library_service import (
+    get_catalog,
+    get_patron_borrowed_books,
+    add_book_to_catalog,
+    borrow_book_by_patron,
+    return_book_by_patron,
+    reset_globals
+)
+
+@pytest.fixture(autouse=True)
+def reset_before_each():
+    reset_globals()
+
+def test_add_book_success():
+    # 使用合法 10 位 ISBN
+    result = add_book_to_catalog('b600', 'Clean Book', 'Author X', '1234567890')
+    assert result is True
+    catalog = get_catalog()
+    assert 'b600' in catalog
+
+def test_borrow_and_return_success():
+    # 添加书并借出
+    add_book_to_catalog('b601', 'Borrow Test', 'Author Y', '1234567890')
+    borrow_book_by_patron('b601', 'patron1')
+    borrowed = get_patron_borrowed_books('patron1')
+    assert any(b['id'] == 'b601' for b in borrowed)
+    # 还书
+    return_book_by_patron('b601', 'patron1')
+    borrowed_after = get_patron_borrowed_books('patron1')
+    assert all(b['id'] != 'b601' for b in borrowed_after)

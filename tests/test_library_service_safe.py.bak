@@ -1,0 +1,33 @@
+import pytest
+from services.library_service import (
+    reset_globals,
+    get_catalog,
+    get_patron_borrowed_books,
+    add_book_to_catalog,
+    borrow_book_by_patron,
+    return_book_by_patron
+)
+
+@pytest.fixture(autouse=True)
+def reset():
+    reset_globals()
+
+def test_add_book_safe():
+    reset_globals()
+    # ISBN 必须符合函数内部严格检查，比如只数字，长度 10 或 13
+    isbn = '0123456789'
+    result = add_book_to_catalog('b900', 'Safe Book', 'Author Safe', isbn)
+    assert result is True
+    catalog = get_catalog()
+    assert 'b900' in catalog
+
+def test_borrow_and_return_safe():
+    reset_globals()
+    isbn = '0123456789'
+    add_book_to_catalog('b901', 'Safe Borrow', 'Author Borrow', isbn)
+    borrow_book_by_patron('b901', 'patron_safe')
+    borrowed = get_patron_borrowed_books('patron_safe')
+    assert any(b['id'] == 'b901' for b in borrowed)
+    return_book_by_patron('b901', 'patron_safe')
+    borrowed_after = get_patron_borrowed_books('patron_safe')
+    assert all(b['id'] != 'b901' for b in borrowed_after)

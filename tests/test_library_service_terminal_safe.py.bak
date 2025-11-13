@@ -1,0 +1,23 @@
+from services.library_service import (
+    reset_globals,
+    add_book_to_catalog,
+    borrow_book_by_patron,
+    get_patron_borrowed_books
+)
+
+def test_add_and_borrow_book():
+    reset_globals()  # 干净开始，全局状态清空
+
+    # 1. 添加一本合法书
+    book_id = 'b1000'
+    title = 'Terminal Safe Book'
+    author = 'Author T'
+    isbn = '1234567890'  # 10位合法 ISBN
+    result = add_book_to_catalog(book_id, title, author, isbn)
+    assert result is True, f"add_book_to_catalog failed, got {result}"
+
+    # 2. 借书
+    patron_id = 'patron_terminal'
+    borrow_book_by_patron(book_id, patron_id)
+    borrowed = get_patron_borrowed_books(patron_id)
+    assert any(b['id'] == book_id for b in borrowed), "Borrowed book not found"
